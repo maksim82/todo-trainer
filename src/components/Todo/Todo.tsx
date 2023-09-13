@@ -9,20 +9,32 @@ interface TodoProps {
 }
 
 const styleTodoWrapper = css`
+    background-color: #9C9C9C;
+    margin-bottom: 20px;
+    padding: 30px 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+`;
+
+const styleTodoContent = css`
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 30px 20px;
-    border-radius: 8px;
     margin-bottom: 20px;
-    background-color: #9C9C9C;
 `;
 
 const styleTodoCompleted = css`
     font-size: 18px;
     cursor: pointer;
     color: #99FF99;
+`;
+
+const styleTodoDate = css`
+    font-size: 18px;
+    color: #fff;
 `;
 
 const styleTodoBtn = css`
@@ -69,6 +81,16 @@ const Todo = observer((props: TodoProps) => {
     const [disabled, setDisabled] = useState(true);
     const saveTaskValue = useRef(todoBody.text);
 
+    let textReminder;
+    let dateReminder;
+
+    if (typeof editTask === 'string') {
+        textReminder = editTask;
+    } else {
+        textReminder = editTask.note;
+        dateReminder = editTask.date;
+    }
+
     const onDelete = () => {
         todo.delete(todoBody.id)
     }
@@ -94,24 +116,27 @@ const Todo = observer((props: TodoProps) => {
 
     return (
         <div css={styleTodoWrapper}>
-            <label css={styleTodoCompleted}>
-                <input type="checkbox" onChange={() => todo.onCompletedTask(todoBody.id)} />
-                Выполнено
-            </label>
-            <input css={styleTodoInput} type="text" value={editTask} disabled={disabled} onChange={onEditValue} />
-            <div>
-                <button css={[styleTodoBtn, styleTodoDeleteBtn]} onClick={onDelete}>Удалить</button>
-                {
-                    disabled
-                        ?
-                    <button css={[styleTodoBtn, styleTodoEditBtn]} onClick={onDisabled}>Изменить</button> 
-                        :
-                    <>
-                        <button css={[styleTodoBtn, styleTodoCloseBtn]} onClick={onClose}>Отменить</button>
-                        <button css={[styleTodoBtn, styleTodoSaveBtn]} onClick={onSave}>Сохранить</button>
-                    </>
-                }
+            <div css={styleTodoContent}>
+                <label css={styleTodoCompleted}>
+                    <input type="checkbox" onChange={() => todo.onCompletedTask(todoBody.id)} />
+                    Выполнено
+                </label>
+                <input css={styleTodoInput} type="text" value={textReminder} disabled={disabled} onChange={onEditValue} />
+                <div>
+                    <button css={[styleTodoBtn, styleTodoDeleteBtn]} onClick={onDelete}>Удалить</button>
+                    {
+                        disabled
+                            ?
+                        <button css={[styleTodoBtn, styleTodoEditBtn]} onClick={onDisabled}>Изменить</button> 
+                            :
+                        <>
+                            <button css={[styleTodoBtn, styleTodoCloseBtn]} onClick={onClose}>Отменить</button>
+                            <button css={[styleTodoBtn, styleTodoSaveBtn]} onClick={onSave}>Сохранить</button>
+                        </>
+                    }
+                </div>
             </div>
+            {dateReminder ? <div css={styleTodoDate}>Дата выполнения: {dateReminder}</div> : undefined}
         </div>
     );
 });

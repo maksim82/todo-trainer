@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { css } from '@emotion/react';
 import { ChangeEvent } from "react";
@@ -52,14 +53,39 @@ const styleTitleSliceStr = css`
 `;
 
 const Header = observer(() => {
+    const textReminder = useRef(todo.todoValue);
+    const dateReminder = useRef(todo.todoDate);
+
     const onChangeValue = (event: ChangeEvent<HTMLInputElement>) => {
         todo.onChangeValue(event.target.value);
     }
 
+    const onChangeDate = (event: ChangeEvent<HTMLInputElement>) => {
+        todo.onChangeDate(event.target.value);
+    }
+
+
+    if (todo.todoDate === '') {
+        textReminder.current = todo.todoValue;
+        dateReminder.current = '';
+    } else {
+        textReminder.current = todo.todoValue;
+        dateReminder.current = todo.todoDate;
+    }
+
     const onCreateCase = () => {
+        let textTodo;
+        if (todo.todoDate === '') {
+            textTodo = todo.todoValue;
+        } else {
+            textTodo = {
+                note: todo.todoValue,
+                date: todo.todoDate,
+            }
+        }
         todo.add({
             id: crypto.randomUUID(),
-            text: todo.todoValue,
+            text: textTodo,
             isCompleted: false,
         });
         todo.resetInputValue();
@@ -73,10 +99,10 @@ const Header = observer(() => {
                     css={[styleCreateTaskInput, styleCreateTaskInputValue]} 
                     type="text" 
                     onChange={onChangeValue} 
-                    value={todo.todoValue} 
+                    value={textReminder.current} 
                     placeholder="Введите таску...."
                     />
-                <input css={[styleCreateTaskInput, styleCreateTaskInputDate]} type="date" />
+                <input css={[styleCreateTaskInput, styleCreateTaskInputDate]} value={dateReminder.current} onChange={onChangeDate} type="date" />
                 <button css={styleCreateTaskBtn} onClick={onCreateCase}>Создать</button>
             </div>
         </div>

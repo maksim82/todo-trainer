@@ -1,9 +1,13 @@
 import { makeAutoObservable } from "mobx";
 
+
+interface IReminder {
+    note: string;
+    date: string;
+}
 export interface ITodo {
     id: string;
-    text: string;
-    date?: number;
+    text: IReminder | string;
     isCompleted: boolean;
 }
 
@@ -11,6 +15,7 @@ class TodoStore {
     completedTodos: ITodo[] = [];
     disabled = true;
     todoValue = '';
+    todoDate = '';
     todos: ITodo[] = [];
 
     constructor() {
@@ -29,12 +34,17 @@ class TodoStore {
         this.todoValue = value;
     }
 
+    onChangeDate(date: string) {
+        this.todoDate = date;
+    }
+
     resetInputValue() {
         this.todoValue = '';
+        this.todoDate = '';
     }
 
 
-    editTask(id: string, text: string) {
+    editTask(id: string, text: string | IReminder) {
         this.todos = this.todos.map(todo => {
             if (todo.id === id) {
                 return {

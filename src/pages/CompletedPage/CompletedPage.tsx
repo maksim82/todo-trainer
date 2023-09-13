@@ -26,6 +26,11 @@ const stylecompletedTaskItem = css`
     margin-top: 20px;
 `;
 
+const stylecompletedTaskDate = css`
+    margin-top: 10px;
+    color: #fff;
+`;
+
 const CompletedPage = observer(() => {
     const completedTasks = todo.completedTodos.length;
 
@@ -33,9 +38,18 @@ const CompletedPage = observer(() => {
         <div>
             <h2 css={stylecompletedTasks}>Выполненных тасков: <span css={stylecompletedTasksCount}>{completedTasks}</span></h2>
             <div css={stylecompletedTasksContainer}>
-                {todo.completedTodos.map(todo => (
+                {todo.completedTodos.map(todo => {
+                    return typeof todo.text === 'string'
+                        ?
                     <div css={stylecompletedTaskItem}>{todo.text}</div>
-                ))}
+                        :
+                    <>
+                        <div css={stylecompletedTaskItem}>
+                            <div>{todo.text.note}</div>
+                            <div css={stylecompletedTaskDate}>Дата выполнения: {todo.text.date}</div>
+                        </div>
+                    </>
+                })}
             </div>
         </div>
     );

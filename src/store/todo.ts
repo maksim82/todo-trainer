@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-
+import { Temporal } from 'temporal-polyfill';
 
 interface IReminder {
     note: string;
@@ -16,6 +16,7 @@ class TodoStore {
     disabled = true;
     todoValue = '';
     todoDate = '';
+    parseDate = '';
     todos: ITodo[] = [];
 
     constructor() {
@@ -35,6 +36,12 @@ class TodoStore {
     }
 
     onChangeDate(date: string) {
+        const dateTime = Temporal.PlainDate.from(date);
+        const day = dateTime.day;
+        const month = dateTime.toLocaleString('default', { month: 'long' });
+        const year = dateTime.year;
+
+        this.parseDate = `Дата: ${day} ${month} ${year}`;
         this.todoDate = date;
     }
 

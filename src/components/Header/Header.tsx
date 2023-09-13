@@ -80,7 +80,7 @@ const Header = observer(() => {
         } else {
             textTodo = {
                 note: todo.todoValue,
-                date: todo.todoDate,
+                date: todo.parseDate,
             }
         }
         todo.add({

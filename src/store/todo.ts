@@ -1,6 +1,5 @@
 import { makeAutoObservable } from "mobx";
 import { Temporal } from 'temporal-polyfill';
-
 interface INote {
     id: string;
     type: 'note';
@@ -56,15 +55,11 @@ class TodoStore {
     }
 
 
-    editTask(id: string, text: string | IReminder) {
-        this.todos = this.todos.map(todo => {
-            if (todo.id === id) {
-                return {
-                    ...todo,
-                    text,
-                }
+    editTask(id: string, text: string) {
+        this.todos.forEach(todo => {
+            if (todo.id === id && todo.type === 'note') {
+                todo.message = text;
             }
-            return todo;
         })
     }
 

@@ -1,10 +1,10 @@
-import Header from "../../components/Header/Header";
-import TodoList from "../../components/TodoList/TodoList";
+import TodoList from "../../todo/TodoList/TodoList";
+import HeaderTodo from "../../todo/HeaderTodo/HeaderTodo";
 
 const HomePage = () => {
     return (
         <>
-            <Header />
+            <HeaderTodo />
             <TodoList />
         </>
     );

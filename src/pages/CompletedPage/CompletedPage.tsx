@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { css } from "@emotion/react";
-import todo from "../../store/todo";
+import TodoStore from "../../store/todo";
+import { usePageViewModel } from "../../hooks/usePageViewModel/usePageViewModel";
 
 const stylecompletedTasksCount = css`
     color: #77DDE7;
@@ -32,21 +33,21 @@ const stylecompletedTaskDate = css`
 `;
 
 const CompletedPage = observer(() => {
-    const completedTasks = todo.completedTodos.length;
+    const store = usePageViewModel<TodoStore>();
+    const allCompletedTasks = store?.todos.filter(todo => todo.isCompleted).length || 0;
 
     return (
         <div>
-            <h2 css={stylecompletedTasks}>Выполненных тасков: <span css={stylecompletedTasksCount}>{completedTasks}</span></h2>
+            <h2 css={stylecompletedTasks}>Выполненных тасков: <span css={stylecompletedTasksCount}>{allCompletedTasks}</span></h2>
             <div css={stylecompletedTasksContainer}>
-                {todo.completedTodos.map(todo => {
-                    return typeof todo.text === 'string'
+                {store?.todos.map(todo => {
+                    return todo.type === 'note'
                         ?
-                    <div css={stylecompletedTaskItem}>{todo.text}</div>
+                    <div css={stylecompletedTaskItem}>{todo.message}</div>
                         :
                     <>
                         <div css={stylecompletedTaskItem}>
-                            <div>{todo.text.note}</div>
-                            <div css={stylecompletedTaskDate}>Дата выполнения: {todo.text.date}</div>
+                            <div css={stylecompletedTaskDate}>Дата выполнения: {store.getDate(todo.date)}</div>
                         </div>
                     </>
                 })}

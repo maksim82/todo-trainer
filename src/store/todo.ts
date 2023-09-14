@@ -1,29 +1,34 @@
 import { makeAutoObservable } from "mobx";
 import { Temporal } from 'temporal-polyfill';
 
-interface IReminder {
-    note: string;
-    date: string;
-}
-export interface ITodo {
+interface INote {
     id: string;
-    text: IReminder | string;
-    isCompleted: boolean;
+    type: 'note';
+    message: string;
+    isCompleted?: boolean;
 }
 
+interface IReminder {
+    id: string;
+    type: 'reminder';
+    date: Temporal.PlainDateTime;
+    isCompleted?: boolean;
+}
+
+export type TypeTodo = INote | IReminder;
+
 class TodoStore {
-    completedTodos: ITodo[] = [];
+    todos: TypeTodo[] = [];
     disabled = true;
     todoValue = '';
     todoDate = '';
     parseDate = '';
-    todos: ITodo[] = [];
 
     constructor() {
         makeAutoObservable(this);
     }
 
-    add(todo: ITodo) {
+    add(todo: TypeTodo) {
         this.todos.push(todo);
     }
 
@@ -36,7 +41,7 @@ class TodoStore {
     }
 
     onChangeDate(date: string) {
-        const dateTime = Temporal.PlainDate.from(date);
+        const dateTime = Temporal.PlainDateTime.from(date);
         const day = dateTime.day;
         const month = dateTime.toLocaleString('default', { month: 'long' });
         const year = dateTime.year;
@@ -64,14 +69,20 @@ class TodoStore {
     }
 
     onCompletedTask(id: string) {
-        this.todos = this.todos.filter(todo => {
+        this.todos.forEach(todo => {
             if (id === todo.id) {
-                this.completedTodos.push(todo);
-                return false
+                todo.isCompleted = !todo.isCompleted
             }
-            return true;
         })
+    }
+
+    getDate(date: Temporal.PlainDateTime) {
+        const day = date.day;
+        const month = date.toLocaleString('default', { month: 'long' });
+        const year = date.year;
+
+        return `Дата: ${day} ${month} ${year}`;
     }
 }
 
-export default new TodoStore();
+export default TodoStore;

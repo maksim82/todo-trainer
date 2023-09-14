@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
 import { css } from "@emotion/react";
 
 const styleNavbarWrapper = css`
@@ -17,13 +18,13 @@ const styleNavbarLink = css`
     }
 `;
 
-const Navbar = () => {
+const Navbar = observer(() => {
     return (
         <div css={styleNavbarWrapper}>
             <Link css={styleNavbarLink} to='/'>Главная</Link>
             <Link css={styleNavbarLink} to='/completed'>Выполненные</Link>
         </div>
     );
-};
+});
 
 export default Navbar;

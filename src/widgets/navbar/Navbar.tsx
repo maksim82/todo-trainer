@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import AppLink from "../../components/appLink/AppLink";
 import { css } from "@emotion/react";
 
 const styleNavbarWrapper = css`
@@ -20,8 +20,8 @@ const styleNavbarLink = css`
 const Navbar = () => {
     return (
         <div css={styleNavbarWrapper}>
-            <Link css={styleNavbarLink} to='/'>Главная</Link>
-            <Link css={styleNavbarLink} to='/completed'>Выполненные</Link>
+            <AppLink css={styleNavbarLink} to='/'>Главная</AppLink>
+            <AppLink css={styleNavbarLink} to='/completed'>Выполненные</AppLink>
         </div>
     );
 };

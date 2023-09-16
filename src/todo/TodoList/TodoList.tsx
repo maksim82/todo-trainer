@@ -2,8 +2,7 @@ import { observer } from "mobx-react-lite";
 import { css } from "@emotion/react";
 import TodoStore from "../../store/todo";
 import Todo from "../Todo/Todo";
-import { usePageViewModel } from "../../hooks/usePageViewModel/usePageViewModel";
-
+import TodoWidgetViewModel from '../../store/TodoWidgetViewModel';
 
 const styleTodoListWrapper = css`
     display: flex;
@@ -32,10 +31,12 @@ const syleTodoListTasksCount = css`
     font-size: 24px;
     color: #009A63;
 `;
+interface TodoListProps {
+    store: TodoStore | null;
+}
 
-const TodoList = observer(() => {
-    const store = usePageViewModel<TodoStore>();
-    const allTasks = store?.todos.filter(todo => !todo.isCompleted).length;
+const TodoList = observer((x: TodoListProps) => {
+    const allTasks = x.store?.todos.filter(todo => !todo.isCompleted).length;
 
     return (
         <div css={styleTodoListWrapper}>
@@ -44,12 +45,14 @@ const TodoList = observer(() => {
             </div>
             <div css={styleTodoListContainer}>
                 {
-                    store?.todos
+                    x.store?.todos
                         .filter(todo => !todo.isCompleted)
                         .map(todoBody => (
                             <Todo
                                 key={todoBody.id}
                                 todoBody={todoBody} 
+                                store={x.store}
+                                storeItem={new TodoWidgetViewModel(todoBody)}
                                 />
                         ))
                 }

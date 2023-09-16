@@ -2,7 +2,6 @@ import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { css } from '@emotion/react';
 import TodoStore from "../../store/todo";
-import { usePageViewModel } from "../../hooks/usePageViewModel/usePageViewModel";
 import Button from "../../components/button/Button";
 import Input from "../../components/input/Input";
 import { Temporal } from 'temporal-polyfill';
@@ -55,40 +54,43 @@ const styleTitleSliceStr = css`
     color: #EE204D;
 `;
 
-const HeaderTodo = observer(() => {
-    const store = usePageViewModel<TodoStore>();
-    const [textReminder, setTextReminder] = useState(store?.todoValue || '');
-    const [dateReminder, setDateReminer] = useState(store?.todoDate || '');
+interface HeaderTodoProps {
+    store: TodoStore | null;
+}
+
+const HeaderTodo = observer((x: HeaderTodoProps) => {
+    const [textReminder, setTextReminder] = useState(x.store?.todoValue || '');
+    const [dateReminder, setDateReminer] = useState(x.store?.todoDate || '');
 
     const onChangeValue = (val: string) => {
         setTextReminder(val);
-        store?.onChangeValue(val);
+        x.store?.onChangeValue(val);
     }
 
     const onChangeDate = (val: string) => {
         setDateReminer(val);
-        store?.onChangeDate(val);
+        x.store?.onChangeDate(val);
     }
 
     const onCreateCase = () => {
-        if (store?.todoValue) {
-            store.add({
+        if (x.store?.todoValue) {
+            x.store.add({
                 id: crypto.randomUUID(),
                 isCompleted: false,
-                message: store.todoValue,
+                message: x.store.todoValue,
                 type: 'note',
             });
-        } else if (store?.todoDate) {
-            store.add({
+        } else if (x.store?.todoDate) {
+            x.store.add({
                 id: crypto.randomUUID(),
                 isCompleted: false,
-                date: Temporal.PlainDateTime.from(store.todoDate),
+                date: Temporal.PlainDateTime.from(x.store.todoDate),
                 type: 'reminder',
             });
         }
         setDateReminer('');
         setTextReminder('');
-        store?.resetInputValue();
+        x.store?.resetInputValue();
     }
 
     return (

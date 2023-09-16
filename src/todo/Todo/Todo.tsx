@@ -1,14 +1,15 @@
 import { observer } from 'mobx-react-lite';
-import { useState, useRef } from 'react';
-import { TypeTodo } from '../../store/todo';
+import TodoStore, { TodoItem } from '../../store/todo';
 import { css } from '@emotion/react';
 import Input from '../../components/input/Input';
 import Button from '../../components/button/Button';
-import TodoStore from "../../store/todo";
-import { usePageViewModel } from "../../hooks/usePageViewModel/usePageViewModel";
+import { getDate } from '../../lib/getDate/getDate';
+import TodoWidgetViewModel from '../../store/TodoWidgetViewModel';
 
 interface TodoProps {
-    todoBody: TypeTodo;
+    todoBody: TodoItem;
+    storeItem: TodoWidgetViewModel;
+    store: TodoStore;
 }
 
 const styleTodoContent = css`
@@ -68,70 +69,34 @@ const styleTodoInput = css`
     border-radius: 8px;
 `;
 
-const Todo = observer((props: TodoProps) => {
-    const {
-        todoBody,
-    } = props;
-
-    let typeTask = useRef('');
-
-    if (todoBody.type === 'note') typeTask.current = todoBody.message;
-
-    const store = usePageViewModel<TodoStore>();
-    const [editTask, setEditTask] = useState(typeTask.current);
-    const [disabled, setDisabled] = useState(true);
-    const saveTaskValue = useRef(typeTask.current);
-
-    const onDelete = () => {
-        store?.delete(todoBody.id)
-    }
-
-    const onDisabled = () => {
-        setDisabled(prevState => !prevState);
-    }
-
-    const onClose = () => {
-        setEditTask(saveTaskValue.current);
-        onDisabled();
-    }
-
-    const onSave = () => {
-        saveTaskValue.current = editTask;
-        store?.editTask(todoBody.id, editTask);
-        onDisabled();
-    }
-
-    const onEditValue = (val: string) => {
-        setEditTask(val);
-    }
-
+const Todo = observer((x: TodoProps) => {
     return (
     <div css={styleTodoContent}>
         <label css={styleTodoCompleted}>
-            <Input type='checkbox' onChange={() => store?.onCompletedTask(todoBody.id)} />
+            <Input type='checkbox' onChange={() => x.storeItem.onCompleted(x.store)} />
             Выполнено
         </label>
         {   
-            todoBody.type === 'note' 
+            x.todoBody.type === 'note' 
                 ?
-            <Input css={styleTodoInput} value={editTask} disabled={disabled} onChange={onEditValue} />
+            <Input css={styleTodoInput} value={x.storeItem.editVisibleTask} disabled={x.storeItem.disabled} onChange={(val) => x.storeItem.onEditValue(val)} />
                 :
-            <div css={styleTodoDate}>{store?.parseDate}</div>
+            <div css={styleTodoDate}>{getDate(x.todoBody.date)}</div>
         }
         <div>
-            <Button css={[styleTodoBtn, styleTodoDeleteBtn]} onClick={onDelete}>Удалить</Button>
+            <Button css={[styleTodoBtn, styleTodoDeleteBtn]} onClick={() => x.storeItem.onDelete(x.store)}>Удалить</Button>
             {
-                todoBody.type === 'note'
+                x.todoBody.type === 'note'
                     ?
                 <>
                 {
-                    disabled
+                    x.storeItem.disabled
                         ?
-                    <Button css={[styleTodoBtn, styleTodoEditBtn]} onClick={onDisabled}>Изменить</Button> 
+                    <Button css={[styleTodoBtn, styleTodoEditBtn]} onClick={() => x.storeItem.onDisabled()}>Изменить</Button> 
                         :
                     <>
-                        <Button css={[styleTodoBtn, styleTodoCloseBtn]} onClick={onClose}>Отменить</Button>
-                        <Button css={[styleTodoBtn, styleTodoSaveBtn]} onClick={onSave}>Сохранить</Button>
+                        <Button css={[styleTodoBtn, styleTodoCloseBtn]} onClick={() => x.storeItem.onClose()}>Отменить</Button>
+                        <Button css={[styleTodoBtn, styleTodoSaveBtn]} onClick={() => x.storeItem.onSave(x.store)}>Сохранить</Button>
                     </>
                 }   
                 </>

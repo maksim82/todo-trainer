@@ -1,5 +1,8 @@
 import { makeAutoObservable } from "mobx";
 import { Temporal } from 'temporal-polyfill';
+import { todos } from "../services/todoServices/todoServices";
+import { LOCAL_STORAGE_KEY } from "../const/localStorage";
+
 interface INote {
     id: string;
     type: 'note';
@@ -14,10 +17,10 @@ interface IReminder {
     isCompleted?: boolean;
 }
 
-export type TypeTodo = INote | IReminder;
+export type TodoItem = INote | IReminder;
 
 class TodoStore {
-    todos: TypeTodo[] = [];
+    todos: TodoItem[] = todos;
     disabled = true;
     todoValue = '';
     todoDate = '';
@@ -27,8 +30,9 @@ class TodoStore {
         makeAutoObservable(this);
     }
 
-    add(todo: TypeTodo) {
+    add(todo: TodoItem) {
         this.todos.push(todo);
+        todos.push(todo);
     }
 
     delete(id: string) {
@@ -64,19 +68,15 @@ class TodoStore {
     }
 
     onCompletedTask(id: string) {
-        this.todos.forEach(todo => {
+        let todoId;
+        this.todos.forEach((todo, index) => {
             if (id === todo.id) {
-                todo.isCompleted = !todo.isCompleted
+                todo.isCompleted = !todo.isCompleted;
+                todoId = index;
             }
-        })
-    }
-
-    getDate(date: Temporal.PlainDateTime) {
-        const day = date.day;
-        const month = date.toLocaleString('default', { month: 'long' });
-        const year = date.year;
-
-        return `Дата: ${day} ${month} ${year}`;
+        });
+        if (todoId != undefined) todos[todoId].isCompleted = true;
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.todos));
     }
 }
 
